@@ -223,23 +223,27 @@ footer span.made-by a {
 </style>
 <script>
 function downloadImage(url) {
-    var filename = url.substring(url.lastIndexOf('/')+1);
-    if (url.includes("?size=")) {
-        url = url.substring(0, url.indexOf("?size="));
-    }
-    var extension = url.split('.').pop();
-    filename += '.' + extension;
-    fetch(url)
-        .then(response => response.blob())
-        .then(blob => {
-            const url = window.URL.createObjectURL(new Blob([blob]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', filename);
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
-        });
+  var filename = url.substring(url.lastIndexOf('/') + 1);
+  if (url.includes('?size=')) {
+    filename = filename.replace(/\?.*/, '') + '?size=1024';
+  }
+  filename = filename.replace(/\?.*/, '') + '.png';
+  fetch(url)
+    .then(response => {
+      const contentType = response.headers.get('content-type');
+      const extension = contentType.split('/')[1];
+      filename += '.' + extension;
+      return response.blob();
+    })
+    .then(blob => {
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    });
 }
 </script>
 
